@@ -1,6 +1,7 @@
 import { pool } from "../db/pool.js";
 import { Request, Response } from "express";
 import { deleteUserFromDb, getAllUsers, getUserFromDb, insertUser, updateUserDb } from "../services/user.service.js";
+import { isValidEmail, isValidUUID } from "../helperfunc/validation.js";
 
 export const getUsers = async (req: Request, res: Response) => {
     try {
@@ -28,6 +29,31 @@ export const addUser = async (req: Request, res: Response) => {
                     message: "Name,email and password are required"
                 })
         }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (name.trim().length < 2) {
+            return res.status(400).json({
+                status: "error",
+                message: "Name must be at least 2 characters"
+            })
+        }
+
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                status: "error",
+                message: "Please provide a valid email"
+            })
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({
+                status: "error",
+                message: "Password must be at least 8 characters"
+            })
+        }
+
+
         const result = await insertUser({ name, email, password })
 
         res.status(201).json({
@@ -52,12 +78,29 @@ export const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { name, email } = req.body;
-
+        if (!isValidUUID(id as string)) {
+            return res.status(400).json({ status: "error", message: "Invalid user ID" })
+        }
         // validation 
         if (!name || !email) {
             return res.status(400).json({
                 status: "error",
                 message: "Name and email are required"
+            })
+        }
+
+
+        if (name.trim().length < 2) {
+            return res.status(400).json({
+                status: "error",
+                message: "Name must be at least 2 characters"
+            })
+        }
+
+        if (isValidEmail(email)) {
+            return res.status(400).json({
+                status: "error",
+                message: "Please provide a valid email"
             })
         }
 
@@ -91,6 +134,10 @@ export const updateUser = async (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+
+        if (!isValidUUID(id as string)) {
+            return res.status(400).json({ status: "error", message: "Invalid user ID" })
+        }
         const result = await getUserFromDb({ id: id as string })
 
         if (result.length === 0) {
@@ -112,6 +159,9 @@ export const getUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
+        if (!isValidUUID(id as string)) {
+            return res.status(400).json({ status: "error", message: "Invalid user ID" })
+        }
         const result = await deleteUserFromDb({ id: id as string })
 
         if (result.length === 0) {
