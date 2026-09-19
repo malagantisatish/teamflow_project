@@ -4,7 +4,7 @@ import { authenticate } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-router.get("/", authenticate, getUsers)
+router.get("/", getUsers)
 
 router.post("/", addUser)
 

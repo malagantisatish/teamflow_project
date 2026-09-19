@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { pool } from "../db/pool";
 import jwt from "jsonwebtoken"
 import { env } from "../config/env";
+import { decode } from "node:punycode";
 
 export const loginQuery = async ({ email, password }: { email: string, password: string }) => {
 
@@ -34,8 +35,18 @@ export const loginQuery = async ({ email, password }: { email: string, password:
     },
         env.jwtSecret,
         {
-            expiresIn: "1h"
+            expiresIn: "15m"
         })
+
+    const refreshToken = jwt.sign(
+        {
+            userId: user.id
+        },
+        env.jwtRefreshSecret,
+        {
+            expiresIn: "7d"
+        }
+    )
 
     return {
         user: {
@@ -43,11 +54,43 @@ export const loginQuery = async ({ email, password }: { email: string, password:
             name: user.name,
             email: user.email,
         },
-        token
+        token,
+        refreshToken: refreshToken
     }
+}
 
 
 
+export const refreshAccessToken = (refreshToken: string) => {
+    try {
+        const decoded = jwt.verify(
+            refreshToken, env.jwtRefreshSecret
+        )
 
+        if (typeof decoded === "string") {
+            return {
+                error: "INVALID_REFRESH_TOKEN"
+            }
+        }
 
+        const accessToken = jwt.sign(
+            { userId: decoded.userId },
+            env.jwtSecret,
+            { expiresIn: "15m" }
+        )
+
+        return {
+            accessToken
+        }
+
+    } catch (error: any) {
+        console.log(error)
+
+        if (error.name === "TokenExpiredError") {
+            return { error: "REFRESH_TOKEN_EXPIRED" }
+        }
+        return {
+            error: "INVALID_REFRESH_TOKEN"
+        }
+    }
 }

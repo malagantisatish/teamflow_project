@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { loginQuery } from "../services/auth.service";
+import { loginQuery, refreshAccessToken } from "../services/auth.service.js";
 
 export const login = async (req: Request, res: Response) => {
     console.log(req.body)
@@ -32,7 +32,9 @@ export const login = async (req: Request, res: Response) => {
         return res.status(200).json({
             status: "success",
             message: "Login successfull",
-            user: result
+            user: result.user,
+            accessToken: result.token,
+            refreshToken: result.refreshToken
         })
 
 
@@ -43,4 +45,46 @@ export const login = async (req: Request, res: Response) => {
             message: "Login failed"
         })
     }
+}
+
+
+export const refreshToken = async (req: Request, res: Response) => {
+    try {
+
+    } catch (error: any) {
+        console.log(error)
+        res.status(500).json({
+            status: "error",
+            message: "Refresh token api failed"
+        })
+    }
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+        return res.status(400).json({
+            status: "error",
+            message: "Refresh token is required"
+        })
+    }
+
+    const result = refreshAccessToken(refreshToken);
+
+    if ("error" in result) {
+        if (result.error === "REFRESH_TOKEN_EXPIRED") {
+            return res.status(401).json({
+                status: "error",
+                message: "Refresh token has expired"
+            })
+
+        }
+        return res.status(401).json({
+            status: "error",
+            message: "Invalid refresh token"
+        })
+    }
+
+    return res.status(200).json({
+        status: "success",
+        message: "Access token refreshed successfully",
+        accessToken: result.accessToken
+    })
 }
