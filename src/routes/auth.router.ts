@@ -1,11 +1,20 @@
 import { Router } from "express";
 import { login } from "../controllers/auth.controller";
+import { authenticate } from "../middleware/auth.middleware";
 
 
 
 const router = Router();
 
-router.post("/login", login)
+router.post("/login", login);
+
+router.get("/protected", authenticate, (req, res) => {
+    res.status(200).json({
+        status: "success",
+        message: "You can access this protected route",
+        user: req.user
+    })
+})
 
 
 export default router

@@ -76,7 +76,11 @@ export const addUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        // const { id } = req.params;
+        const id = req.user?.userId
+
+        console.log(id)
+
         const { name, email } = req.body;
         if (!isValidUUID(id as string)) {
             return res.status(400).json({ status: "error", message: "Invalid user ID" })
@@ -189,6 +193,41 @@ export const deleteUser = async (req: Request, res: Response) => {
         res.status(500).json({
             status: "error",
             message: "Failed to delete user"
+        })
+
+    }
+}
+
+export const getMe = async (req: Request, res: Response) => {
+    console.log("getme")
+    try {
+        const userId = req.user?.userId;
+        console.log("userid", userId)
+        if (!userId) {
+            return res.status(401).json({
+                status: "error",
+                message: "Unauthorized"
+            })
+        }
+
+        const user = await getUserFromDb({ id: userId })
+        if (!user) {
+            return res.status(404).json({
+                status: "error",
+                message: "User not found"
+            })
+        }
+
+        return res.status(200).json({
+            status: "success",
+            user: user[0]
+        })
+
+    } catch (error: any) {
+        console.log(error);
+        return res.status(500).json({
+            status: "error",
+            message: "Failed to fetch user"
         })
 
     }

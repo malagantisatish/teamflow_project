@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import { pool } from "../db/pool";
+import jwt from "jsonwebtoken"
+import { env } from "../config/env";
 
 export const loginQuery = async ({ email, password }: { email: string, password: string }) => {
 
@@ -26,11 +28,22 @@ export const loginQuery = async ({ email, password }: { email: string, password:
         };
     }
 
-    return {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+    const token = jwt.sign({
+        userId: user.id,
+        email: user.email
+    },
+        env.jwtSecret,
+        {
+            expiresIn: "1h"
+        })
 
+    return {
+        user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        },
+        token
     }
 
 

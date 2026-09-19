@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { loginQuery } from "../services/auth.service";
 
 export const login = async (req: Request, res: Response) => {
+    console.log(req.body)
 
     try {
         const { email, password } = req.body;
