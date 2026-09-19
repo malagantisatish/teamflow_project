@@ -34,7 +34,7 @@ export const loginQuery = async ({ email, password }: { email: string, password:
     },
         env.jwtSecret,
         {
-            expiresIn: "1h"
+            expiresIn: "10s"
         })
 
     return {
