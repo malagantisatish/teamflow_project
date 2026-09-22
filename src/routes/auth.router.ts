@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { login, refreshToken } from "../controllers/auth.controller";
+import { login, logout, refreshToken } from "../controllers/auth.controller";
 import { authenticate } from "../middleware/auth.middleware";
 
 
@@ -7,6 +7,7 @@ import { authenticate } from "../middleware/auth.middleware";
 const router = Router();
 
 router.post("/login", login);
+
 
 router.get("/protected", authenticate, (req, res) => {
     res.status(200).json({
@@ -18,6 +19,12 @@ router.get("/protected", authenticate, (req, res) => {
 
 
 router.post("/refresh", refreshToken)
+
+router.post("/logout", logout)
+
+
+
+
 
 
 export default router

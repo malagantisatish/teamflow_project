@@ -61,7 +61,7 @@ export const loginQuery = async ({ email, password }: { email: string, password:
 
 
 
-export const refreshAccessToken = (refreshToken: string) => {
+export const refreshAccessToken = async (refreshToken: string) => {
     try {
         const decoded = jwt.verify(
             refreshToken, env.jwtRefreshSecret
@@ -71,6 +71,11 @@ export const refreshAccessToken = (refreshToken: string) => {
             return {
                 error: "INVALID_REFRESH_TOKEN"
             }
+        }
+
+        const dbRefreshToken = await findRefreshToken({ token: refreshToken })
+        if (!dbRefreshToken) {
+            return { error: "REFRESH_TOKEN_NOT_FOUND" }
         }
 
         const accessToken = jwt.sign(
@@ -93,4 +98,29 @@ export const refreshAccessToken = (refreshToken: string) => {
             error: "INVALID_REFRESH_TOKEN"
         }
     }
+
+}
+
+
+export const refreshTokenExpiresAt = new Date(
+    Date.now() + 7 * 24 * 60 * 60 * 1000
+);
+
+export const saveRefreshToken = async ({ userId, expiresAt, token }: { userId: string, token: string, expiresAt: Date }) => {
+
+    await pool.query(
+        `INSERT INTO refresh_tokens 
+           (user_id, token, expires_at)
+           VALUES ($1,$2,$3)`, [userId, token, expiresAt]
+    )
+}
+
+
+export const findRefreshToken = async ({ token }: { token: string }) => {
+    const result = await pool.query(`
+        SELECT id, user_id, token, expires_at
+        FROM refresh_tokens WHERE token = $1`, [token])
+
+    return result.rows[0]
+
 }
