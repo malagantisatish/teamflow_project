@@ -124,3 +124,8 @@ export const findRefreshToken = async ({ token }: { token: string }) => {
     return result.rows[0]
 
 }
+
+export const deleteRefreshToken = async ({ token }: { token: string }) => {
+    await pool.query(`
+        DELETE FROM refresh_tokens where token=$1`, [token])
+}

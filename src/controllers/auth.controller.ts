@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { findRefreshToken, loginQuery, refreshAccessToken, refreshTokenExpiresAt, saveRefreshToken } from "../services/auth.service.js";
+import { deleteRefreshToken, findRefreshToken, loginQuery, refreshAccessToken, refreshTokenExpiresAt, saveRefreshToken } from "../services/auth.service.js";
 import { env } from "../config/env.js";
 
 export const login = async (req: Request, res: Response) => {
@@ -112,6 +112,11 @@ export const refreshToken = async (req: Request, res: Response) => {
 
 export const logout = async (req: Request, res: Response) => {
     try {
+
+        const refreshToken = req.cookies.refreshToken;
+        if (refreshToken) {
+            await deleteRefreshToken({ token: refreshToken })
+        }
         res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: env.nodeEnv === "production",
