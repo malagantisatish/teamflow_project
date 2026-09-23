@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { deleteRefreshToken, findRefreshToken, loginQuery, refreshAccessToken, refreshTokenExpiresAt, saveRefreshToken } from "../services/auth.service.js";
 import { env } from "../config/env.js";
+import jwt from "jsonwebtoken"
 
 export const login = async (req: Request, res: Response) => {
     console.log(req.body)
@@ -72,6 +73,8 @@ export const refreshToken = async (req: Request, res: Response) => {
             })
         }
 
+        // in below i am generating the access token by validating the refresh token
+
         const result = await refreshAccessToken(refreshToken);
 
         if ("error" in result) {
@@ -94,6 +97,13 @@ export const refreshToken = async (req: Request, res: Response) => {
                 message: "Invalid refresh token"
             })
         }
+
+        res.cookie("refreshToken", result.newRefreshToken, {
+            httpOnly: true,
+            secure: env.nodeEnv === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
 
         return res.status(200).json({
             status: "success",

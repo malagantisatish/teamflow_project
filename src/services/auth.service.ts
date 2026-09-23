@@ -61,7 +61,7 @@ export const loginQuery = async ({ email, password }: { email: string, password:
 
 
 
-export const refreshAccessToken = async (refreshToken: string) => {
+export const refreshAccessToken = async (refreshToken: string) => { // generating the new access token by validating the  refresh token
     try {
         const decoded = jwt.verify(
             refreshToken, env.jwtRefreshSecret
@@ -81,11 +81,28 @@ export const refreshAccessToken = async (refreshToken: string) => {
         const accessToken = jwt.sign(
             { userId: decoded.userId },
             env.jwtSecret,
-            { expiresIn: "15m" }
+            { expiresIn: "1m" }
         )
 
+        const newRefreshToken = jwt.sign(
+            { userId: decoded.userId },
+            env.jwtRefreshSecret,
+            {
+                expiresIn: "7d"
+            }
+        )
+
+        const expiresAt = refreshTokenExpiresAt
+
+        await saveRefreshToken({ expiresAt: expiresAt, token: newRefreshToken, userId: decoded.userId })
+
+        await deleteRefreshToken({ token: refreshToken });
+
+
+
         return {
-            accessToken
+            accessToken,
+            newRefreshToken
         }
 
     } catch (error: any) {
