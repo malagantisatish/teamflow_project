@@ -31,7 +31,8 @@ export const loginQuery = async ({ email, password }: { email: string, password:
 
     const token = jwt.sign({
         userId: user.id,
-        email: user.email
+        email: user.email,
+        role: user.role
     },
         env.jwtSecret,
         {
@@ -53,6 +54,7 @@ export const loginQuery = async ({ email, password }: { email: string, password:
             id: user.id,
             name: user.name,
             email: user.email,
+            role: user.role
         },
         token,
         refreshToken: refreshToken

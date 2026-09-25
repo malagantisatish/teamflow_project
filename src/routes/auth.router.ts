@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { login, logout, refreshToken } from "../controllers/auth.controller";
 import { authenticate } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/authorize.middleware";
 
 
 
@@ -9,7 +10,7 @@ const router = Router();
 router.post("/login", login);
 
 
-router.get("/protected", authenticate, (req, res) => {
+router.get("/protected", authenticate, authorize({ requiredRole: "admin" }), (req, res) => {
     res.status(200).json({
         status: "success",
         message: "You can access this protected route",

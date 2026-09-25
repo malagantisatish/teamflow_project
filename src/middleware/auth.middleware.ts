@@ -37,6 +37,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         req.user = decoded as JwtPayload & {
             userId: string;
             email: string;
+            role: "user" | "admin";
         }
 
         next();
