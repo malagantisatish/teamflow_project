@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createProjectQuery, getProjectsByOwnerid } from "../services/projects.service";
+import { createProjectQuery, getProjectById, getProjectsByOwnerid } from "../services/projects.service";
 
 export const createProjectController = async (req: Request, res: Response) => {
     try {
@@ -65,6 +65,39 @@ export const getProjectsController = async (req: Request, res: Response) => {
         return res.status(500).json({
             status: "error",
             message: "Failed to fetch the  projects"
+        })
+    }
+}
+
+
+export const getProjectByidController = async (req: Request, res: Response) => {
+    try {
+        const ownerId = req.user?.userId;
+        const { id } = req.params;
+        if (!ownerId) {
+            return res.status(401).json({
+                status: "error",
+                message: "Unauthorized"
+            })
+        }
+
+        const project = await getProjectById({ ownerId: ownerId, projectid: id as string });
+        if (!project) {
+            return res.status(404).json({
+                status: "error",
+                message: "Project not found"
+            })
+        }
+        return res.status(200).json({
+            status: "Success",
+            project
+        })
+
+    } catch (error: any) {
+        console.log(error);
+        return res.status(500).json({
+            status: "error",
+            message: "Failed to fetch project"
         })
     }
 }

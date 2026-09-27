@@ -18,3 +18,14 @@ export const getProjectsByOwnerid = async ({ ownerId }: { ownerId: string }) => 
     return result.rows
 
 }
+
+export const getProjectById = async ({ ownerId, projectid }: { projectid: string, ownerId: string }) => {
+    const result = await pool.query(`
+        SELECT id,name,description,owner_id,created_at,updated_at
+        FROM projects
+        WHERE id = $1 AND owner_id = $2`, [projectid, ownerId]);
+
+    return result.rows[0] || null
+
+
+}
