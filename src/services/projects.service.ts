@@ -29,3 +29,16 @@ export const getProjectById = async ({ ownerId, projectid }: { projectid: string
 
 
 }
+
+export const updateProject = async ({ description, name, ownerId, projectId }: { ownerId: string, projectId: string, description: string, name: string, }) => {
+    const result = await pool.query(`
+        UPDATE projects
+        SET 
+           name = $1,
+           description = $2,
+           updated_at = NOW()
+           WHERE id = $3 and owner_id = $4
+           RETURNING id,name, description, owner_id, created_at, updated_at`, [name, description, projectId, ownerId])
+
+    return result.rows[0] || null
+}
