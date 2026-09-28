@@ -42,3 +42,13 @@ export const updateProject = async ({ description, name, ownerId, projectId }: {
 
     return result.rows[0] || null
 }
+
+
+export const deleteProject = async ({ ownerId, projectId }: { ownerId: string, projectId: string }) => {
+    const result = await pool.query(`
+        DELETE FROM projects
+        WHERE id = $1 and owner_id = $2
+        RETURNING id`, [projectId, ownerId])
+    return result.rows[0] || null
+
+}
