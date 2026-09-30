@@ -10,6 +10,7 @@ router.post("/", authenticate, createProjectController);
 router.get("/", authenticate, getProjectsController)
 router.get("/:id", authenticate, getProjectByidController);
 router.put("/:id", authenticate, updateProjectController);
-router.delete("/:id", authenticate, deleteProjectController)
+router.delete("/:id", authenticate, deleteProjectController);
+
 
 export default router

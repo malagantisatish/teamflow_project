@@ -2,7 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/user.routes.js"
 import authRoutes from "./routes/auth.router.js";
-import projectRoutes from "./routes/project.routes.js"
+import projectRoutes from "./routes/project.routes.js";
+import projectMembersroutes from "./routes/projectMember.router.js"
 const app = express();
 
 app.use(express.json());
@@ -25,6 +26,7 @@ app.use(cookieParser())
 app.use("/users", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/project", projectRoutes)
+app.use("/project_member", projectMembersroutes)
 
 
 export default app;
