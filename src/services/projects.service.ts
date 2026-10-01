@@ -51,4 +51,14 @@ export const deleteProject = async ({ ownerId, projectId }: { ownerId: string, p
         RETURNING id`, [projectId, ownerId])
     return result.rows[0] || null
 
+};
+
+
+export const isProjectOwnerQuery = async ({ ownerId, projectId }: { ownerId: string, projectId: string }) => {
+    const result = await pool.query(`
+        SELECT id from projects 
+        WHERE id = $1 AND owner_id = $2
+        `, [projectId, ownerId]);
+
+    return result.rows.length > 0;
 }

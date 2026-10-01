@@ -1,9 +1,11 @@
-import { Request, Response } from "express";
-import { addProjectMember } from "../services/projectMember.service";
+import e, { Request, Response } from "express";
+import { addProjectMember, getProjectMembersQuery } from "../services/projectMember.service";
+import { isProjectOwnerQuery } from "../services/projects.service";
 
 export const addProjectMemberController = async (req: Request, res: Response) => {
     try {
         const ownerId = req.user?.userId;
+        const { id: projectId } = req.params
         const { userId } = req.body;
 
         if (!ownerId) {
@@ -20,7 +22,16 @@ export const addProjectMemberController = async (req: Request, res: Response) =>
             });
         };
 
-        const result = await addProjectMember({ projectId: userId as string, userId: ownerId });
+        const isProjectOwner = await isProjectOwnerQuery({ ownerId: ownerId, projectId: projectId as string });
+
+        if (!isProjectOwner) {
+            return res.status(403).json({
+                status: "error",
+                message: "Only the project owner can add members"
+            })
+        }
+
+        const result = await addProjectMember({ projectId: projectId as string, userId: ownerId });
         return res.status(201).json({
             status: "success",
             memberDetails: result
@@ -43,4 +54,22 @@ export const addProjectMemberController = async (req: Request, res: Response) =>
     }
 }
 
+export const getProjectMemberController = async (req: Request, res: Response) => {
+    try {
+        const ownerId = req.user?.userId
+        const result = await getProjectMembersQuery({ userId: ownerId as string });
+        return res.status(200).json({
+            status: "success",
+            projectMembers: result
+        })
+
+    } catch (error: any) {
+        console.log(error);
+        return res.status(500).json({
+            status: "error",
+            message: "Failed to get project members list"
+        })
+
+    }
+}
 

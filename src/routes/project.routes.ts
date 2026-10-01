@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
 import { createProjectController, deleteProjectController, getProjectByidController, getProjectsController, updateProjectController } from "../controllers/project.controller";
+import { addProjectMemberController } from "../controllers/projectMember.controller";
 
 const router = Router();
 
@@ -11,6 +12,11 @@ router.get("/", authenticate, getProjectsController)
 router.get("/:id", authenticate, getProjectByidController);
 router.put("/:id", authenticate, updateProjectController);
 router.delete("/:id", authenticate, deleteProjectController);
+
+// project members 
+
+router.post("/:id/members", authenticate, addProjectMemberController);
+
 
 
 export default router
