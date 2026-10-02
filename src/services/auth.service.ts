@@ -83,7 +83,7 @@ export const refreshAccessToken = async (refreshToken: string) => { // generatin
         const accessToken = jwt.sign(
             { userId: decoded.userId },
             env.jwtSecret,
-            { expiresIn: "1m" }
+            { expiresIn: "15m" }
         )
 
         const newRefreshToken = jwt.sign(

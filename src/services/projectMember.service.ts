@@ -15,12 +15,20 @@ export const addProjectMember = async ({ projectId, userId }: { projectId: strin
 
 }
 
-export const getProjectMembersQuery = async ({ userId }: { userId: string }) => {
-    const result = await pool.query(
-        `SELECT * FROM project_members
-        WHERE user_id = $1`, [userId]
-    );
+export const getProjectMembers = async ({ projectId }: { projectId: string }) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+             u.id,u.name,u.email,pm.role,pm.created_at 
+             FROM project_members pm
+              INNER JOIN users u ON pm.user_id = u.id
+              WHERE pm.project_id = $1
+              ORDER BY pm.created_at ASC`, [projectId]);
+        return result.rows
 
-    return result.rows
+    } catch (error) {
+        console.log(error)
+        return null
+    }
 
 }

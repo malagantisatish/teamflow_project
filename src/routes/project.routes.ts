@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware";
 import { createProjectController, deleteProjectController, getProjectByidController, getProjectsController, updateProjectController } from "../controllers/project.controller";
-import { addProjectMemberController } from "../controllers/projectMember.controller";
+import { addProjectMemberController, getProjectMembersController } from "../controllers/projectMember.controller";
 
 const router = Router();
 
@@ -15,7 +15,8 @@ router.delete("/:id", authenticate, deleteProjectController);
 
 // project members 
 
-router.post("/:id/members", authenticate, addProjectMemberController);
+router.post("/:id/members", authenticate, addProjectMemberController); // here id is project id 
+router.get("/:id/members", authenticate, getProjectMembersController)
 
 
 
