@@ -1,5 +1,5 @@
 import e, { Request, Response } from "express";
-import { addProjectMember, getProjectMembers } from "../services/projectMember.service";
+import { addProjectMember, getProjectMembers, removeProjectMemberQuery } from "../services/projectMember.service";
 import { isProjectOwnerQuery } from "../services/projects.service";
 
 export const addProjectMemberController = async (req: Request, res: Response) => {
@@ -90,3 +90,42 @@ export const getProjectMembersController = async (req: Request, res: Response) =
     }
 }
 
+export const removeProjectMemberController = async (req: Request, res: Response) => {
+    try {
+        const ownerId = req.user?.userId;
+        const { id: projectId } = req.params;
+
+        if (!ownerId) {
+            return res.status(401).json({
+                status: "error",
+                message: "Authentication required"
+            })
+        };
+
+        const isOwner = await isProjectOwnerQuery({ ownerId: ownerId, projectId: projectId as string });
+        if (!isOwner) {
+            return res.status(403).json({
+                status: "error",
+                message: "Only the project owner can view project members"
+            })
+        }
+
+        const result = await removeProjectMemberQuery({ projectId: projectId as string, userId: ownerId });
+        if (!result) {
+            return res.status(404).json({
+                status: "error",
+                message: "Member not found"
+            })
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Member removed from project"
+        })
+
+
+    } catch (error: any) {
+
+    }
+
+}

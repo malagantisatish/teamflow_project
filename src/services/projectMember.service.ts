@@ -32,3 +32,16 @@ export const getProjectMembers = async ({ projectId }: { projectId: string }) =>
     }
 
 }
+
+
+export const removeProjectMemberQuery = async ({ projectId, userId }: { projectId: string, userId: string }) => {
+    const result = await pool.query(`
+        DELETE from project_members
+        WHERE project_id = $1
+        AND user_id = $2
+        RETURNING id,project_id,user_id`,
+        [projectId, userId]);
+
+    return result.rows[0] || null
+
+}
