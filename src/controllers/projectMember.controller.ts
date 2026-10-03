@@ -93,7 +93,7 @@ export const getProjectMembersController = async (req: Request, res: Response) =
 export const removeProjectMemberController = async (req: Request, res: Response) => {
     try {
         const ownerId = req.user?.userId;
-        const { id: projectId } = req.params;
+        const { id: projectId, userId } = req.params;
 
         if (!ownerId) {
             return res.status(401).json({
@@ -101,6 +101,13 @@ export const removeProjectMemberController = async (req: Request, res: Response)
                 message: "Authentication required"
             })
         };
+
+        if (!userId) {
+            return res.status(404).json({
+                status: "error",
+                message: "UserId is required"
+            })
+        }
 
         const isOwner = await isProjectOwnerQuery({ ownerId: ownerId, projectId: projectId as string });
         if (!isOwner) {
@@ -110,7 +117,7 @@ export const removeProjectMemberController = async (req: Request, res: Response)
             })
         }
 
-        const result = await removeProjectMemberQuery({ projectId: projectId as string, userId: ownerId });
+        const result = await removeProjectMemberQuery({ projectId: projectId as string, userId: userId as string });
         if (!result) {
             return res.status(404).json({
                 status: "error",
