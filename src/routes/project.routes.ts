@@ -18,7 +18,9 @@ router.delete("/:id", authenticate, deleteProjectController);
 router.post("/:id/members", authenticate, addProjectMemberController); // here id is project id 
 router.get("/:id/members", authenticate, getProjectMembersController)
 
-router.delete("/:id", authenticate, removeProjectMemberController)
+router.delete("/:id/members", authenticate, removeProjectMemberController);
+
+
 
 
 

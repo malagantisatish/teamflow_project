@@ -106,7 +106,7 @@ export const removeProjectMemberController = async (req: Request, res: Response)
         if (!isOwner) {
             return res.status(403).json({
                 status: "error",
-                message: "Only the project owner can view project members"
+                message: "Only the project owner can remove project members"
             })
         }
 
